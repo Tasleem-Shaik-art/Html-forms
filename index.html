@@ -1,0 +1,518 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Form – Task 4</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: #0f0c29;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* floating blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 420px; height: 420px;
+      background: #f857a6;
+      top: -100px; left: -100px;
+    }
+    body::after {
+      width: 380px; height: 380px;
+      background: #10b981;
+      bottom: -80px; right: -80px;
+    }
+
+    /* ── WRAPPER ── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(248,87,166,0.18);
+      border: 1px solid rgba(248,87,166,0.4);
+      color: #f857a6;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+    .badge span { width: 6px; height: 6px; border-radius: 50%; background: #f857a6; animation: pulse 1.4s infinite; display: inline-block; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+
+    /* ── HEADING AREA ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      letter-spacing: -1px;
+    }
+    .hero h1 .gradient-text {
+      background: linear-gradient(90deg, #f857a6, #ff5858, #ffb347);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: rgba(255,255,255,0.55);
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 40px 44px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ── GRID ROW ── */
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    /* ── FIELD GROUP ── */
+    .field-group { margin-bottom: 22px; }
+    .field-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 8px;
+      letter-spacing: 0.2px;
+    }
+    .field-group label .req { color: #f857a6; margin-left: 2px; }
+
+    /* ── INPUTS ── */
+    .field-group input[type="text"],
+    .field-group input[type="email"],
+    .field-group input[type="tel"],
+    .field-group select,
+    .field-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      font-size: 0.93rem;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    }
+    .field-group input::placeholder,
+    .field-group textarea::placeholder { color: rgba(255,255,255,0.3); }
+    .field-group select { color: rgba(255,255,255,0.75); cursor: pointer; }
+    .field-group select option { background: #302b63; color: #fff; }
+
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
+      border-color: #f857a6;
+      background: rgba(248,87,166,0.08);
+      box-shadow: 0 0 0 4px rgba(248,87,166,0.15);
+    }
+    .field-group textarea { resize: vertical; min-height: 120px; }
+
+    /* ── INVALID ── */
+    .field-group input.invalid,
+    .field-group select.invalid,
+    .field-group textarea.invalid {
+      border-color: #ff5858;
+      background: rgba(255,88,88,0.08);
+      box-shadow: 0 0 0 4px rgba(255,88,88,0.12);
+    }
+
+    /* ── ERROR TEXT ── */
+    .error-msg {
+      display: none;
+      color: #ff8a8a;
+      font-size: 0.77rem;
+      margin-top: 5px;
+      font-weight: 500;
+      padding-left: 4px;
+    }
+    .error-msg.show { display: block; }
+
+    /* ── PILL OPTIONS (radio & checkbox) ── */
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .pill-group input[type="radio"],
+    .pill-group input[type="checkbox"] { display: none; }
+    .pill-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 100px;
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.05);
+      margin-bottom: 0;
+    }
+    .pill-group label:hover { border-color: #f857a6; color: #fff; background: rgba(248,87,166,0.1); }
+    .pill-group input:checked + label {
+      border-color: #f857a6;
+      background: linear-gradient(135deg, rgba(248,87,166,0.25), rgba(255,88,88,0.18));
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(248,87,166,0.18);
+    }
+    .pill-group.invalid-group label { border-color: rgba(255,88,88,0.5); }
+
+    /* ── NEWSLETTER TOGGLE ── */
+    .newsletter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+    }
+    .newsletter-row input[type="checkbox"] { display: none; }
+    .toggle-switch {
+      position: relative;
+      width: 44px; height: 24px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.25s;
+      flex-shrink: 0;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.25s;
+    }
+    #newsletter:checked ~ .newsletter-row .toggle-switch,
+    .toggle-switch.on { background: linear-gradient(90deg, #f857a6, #ff5858); }
+    #newsletter:checked ~ .newsletter-row .toggle-switch::after,
+    .toggle-switch.on::after { transform: translateX(20px); }
+    .newsletter-row .nl-text { font-size: 0.88rem; color: rgba(255,255,255,0.7); }
+    .newsletter-row .nl-text strong { color: #fff; font-weight: 600; display: block; font-size: 0.9rem; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 28px 0; }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #f857a6 0%, #ff5858 50%, #ffb347 100%);
+      background-size: 200% 100%;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s, background-position 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(248,87,166,0.45);
+      background-position: right center;
+    }
+    .btn-submit:active { transform: translateY(0); box-shadow: none; }
+
+    /* ── SUCCESS BANNER ── */
+    #success-banner {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    #success-banner.show { display: block; }
+    .success-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2.2rem;
+      box-shadow: 0 0 0 16px rgba(16,185,129,0.12);
+      animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes pop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+    #success-banner h2 { font-size: 1.5rem; color: #fff; font-weight: 700; }
+    #success-banner p { color: rgba(255,255,255,0.55); margin-top: 8px; font-size: 0.92rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 580px) {
+      .card { padding: 28px 20px; }
+      .row { grid-template-columns: 1fr; gap: 0; }
+      .hero h1 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge"><span></span> Get in touch</div>
+    <h1>Let's <span class="gradient-text">Connect</span> 🚀</h1>
+    <p>Fill out the form below and we'll get back to you within 1–2 business days.</p>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- SUCCESS BANNER -->
+    <div id="success-banner">
+      <div class="success-icon">✓</div>
+      <h2>Message Sent!</h2>
+      <p>Thanks for reaching out. We'll be in touch soon.</p>
+    </div>
+
+    <form id="contactForm" novalidate>
+
+      <div class="section-label">Personal info</div>
+
+      <!-- ROW 1: Name + Email -->
+      <div class="row">
+        <div class="field-group">
+          <label for="fullName">Full Name <span class="req">*</span></label>
+          <input type="text" id="fullName" name="fullName" placeholder="e.g. Rahul Sharma" />
+          <span class="error-msg" id="err-fullName">Please enter your full name.</span>
+        </div>
+        <div class="field-group">
+          <label for="email">Email Address <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" />
+          <span class="error-msg" id="err-email">Enter a valid email address.</span>
+        </div>
+      </div>
+
+      <!-- ROW 2: Phone + Country -->
+      <div class="row">
+        <div class="field-group">
+          <label for="phone">Phone Number <span class="req">*</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="10-digit number" maxlength="10" />
+          <span class="error-msg" id="err-phone">Enter a valid 10-digit number.</span>
+        </div>
+        <div class="field-group">
+          <label for="country">Country <span class="req">*</span></label>
+          <select id="country" name="country">
+            <option value="">-- Select Country --</option>
+            <option>India</option>
+            <option>United States</option>
+            <option>United Kingdom</option>
+            <option>Canada</option>
+            <option>Australia</option>
+            <option>Germany</option>
+            <option>Japan</option>
+            <option>Other</option>
+          </select>
+          <span class="error-msg" id="err-country">Please select your country.</span>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:6px;">About you</div>
+
+      <!-- GENDER -->
+      <div class="field-group">
+        <label>Gender <span class="req">*</span></label>
+        <div class="pill-group" id="genderGroup">
+          <input type="radio" name="gender" id="g1" value="Male" /><label for="g1">♂ Male</label>
+          <input type="radio" name="gender" id="g2" value="Female" /><label for="g2">♀ Female</label>
+          <input type="radio" name="gender" id="g3" value="Other" /><label for="g3">⚧ Other</label>
+          <input type="radio" name="gender" id="g4" value="Prefer not to say" /><label for="g4">🤐 Prefer not to say</label>
+        </div>
+        <span class="error-msg" id="err-gender">Please select a gender.</span>
+      </div>
+
+      <!-- INTERESTS -->
+      <div class="field-group">
+        <label>Interests <span class="req">*</span> <span style="font-weight:400;color:rgba(255,255,255,0.35);font-size:0.78rem;">(pick at least one)</span></label>
+        <div class="pill-group" id="interestsGroup">
+          <input type="checkbox" name="interests" id="i1" value="Web Development" /><label for="i1">💻 Web Dev</label>
+          <input type="checkbox" name="interests" id="i2" value="Design" /><label for="i2">🎨 Design</label>
+          <input type="checkbox" name="interests" id="i3" value="Marketing" /><label for="i3">📣 Marketing</label>
+          <input type="checkbox" name="interests" id="i4" value="Data Science" /><label for="i4">📊 Data Science</label>
+          <input type="checkbox" name="interests" id="i5" value="Mobile Apps" /><label for="i5">📱 Mobile Apps</label>
+        </div>
+        <span class="error-msg" id="err-interests">Please select at least one interest.</span>
+      </div>
+
+      <div class="section-label" style="margin-top:6px;">Your message</div>
+
+      <!-- MESSAGE -->
+      <div class="field-group">
+        <label for="message">Message <span class="req">*</span></label>
+        <textarea id="message" name="message" placeholder="Write your message here... (min 10 characters)"></textarea>
+        <span class="error-msg" id="err-message">Please enter a message (min 10 characters).</span>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- NEWSLETTER -->
+      <div class="newsletter-row" id="nlRow">
+        <input type="checkbox" id="newsletter" name="newsletter" />
+        <div class="toggle-switch" id="toggleSwitch"></div>
+        <div class="nl-text">
+          <strong>Stay in the loop</strong>
+          Subscribe to get updates, tips and exclusive offers
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <button type="submit" class="btn-submit">Send Message &nbsp;→</button>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('contactForm');
+  const toggleSwitch = document.getElementById('toggleSwitch');
+  const newsletterCb = document.getElementById('newsletter');
+
+  // Toggle switch
+  toggleSwitch.addEventListener('click', () => {
+    newsletterCb.checked = !newsletterCb.checked;
+    toggleSwitch.classList.toggle('on', newsletterCb.checked);
+  });
+
+  // Helpers
+  function markInvalid(id, errId) {
+    document.getElementById(id).classList.add('invalid');
+    document.getElementById(errId).classList.add('show');
+    return false;
+  }
+  function markValid(id, errId) {
+    document.getElementById(id).classList.remove('invalid');
+    document.getElementById(errId).classList.remove('show');
+    return true;
+  }
+
+  // Live clearing
+  ['fullName','email','phone','country','message'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      document.getElementById(id).classList.remove('invalid');
+      document.getElementById('err-' + id).classList.remove('show');
+    });
+  });
+
+  // Phone digits only
+  document.getElementById('phone').addEventListener('keypress', e => {
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+  });
+
+  function validate() {
+    let valid = true;
+
+    const name = document.getElementById('fullName').value.trim();
+    name.length >= 2 ? markValid('fullName','err-fullName') : (valid = markInvalid('fullName','err-fullName'));
+
+    const email = document.getElementById('email').value.trim();
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? markValid('email','err-email') : (valid = markInvalid('email','err-email'));
+
+    const phone = document.getElementById('phone').value.trim();
+    /^[0-9]{10}$/.test(phone) ? markValid('phone','err-phone') : (valid = markInvalid('phone','err-phone'));
+
+    const country = document.getElementById('country').value;
+    country ? markValid('country','err-country') : (valid = markInvalid('country','err-country'));
+
+    const gender = document.querySelector('input[name="gender"]:checked');
+    const gGroup = document.getElementById('genderGroup');
+    const gErr = document.getElementById('err-gender');
+    if (gender) { gGroup.classList.remove('invalid-group'); gErr.classList.remove('show'); }
+    else { gGroup.classList.add('invalid-group'); gErr.classList.add('show'); valid = false; }
+
+    const interests = document.querySelectorAll('input[name="interests"]:checked');
+    const iGroup = document.getElementById('interestsGroup');
+    const iErr = document.getElementById('err-interests');
+    if (interests.length > 0) { iGroup.classList.remove('invalid-group'); iErr.classList.remove('show'); }
+    else { iGroup.classList.add('invalid-group'); iErr.classList.add('show'); valid = false; }
+
+    const msg = document.getElementById('message').value.trim();
+    msg.length >= 10 ? markValid('message','err-message') : (valid = markInvalid('message','err-message'));
+
+    return valid;
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validate()) return;
+    form.style.display = 'none';
+    const banner = document.getElementById('success-banner');
+    banner.classList.add('show');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+</script>
+
+</body>
+</html>
